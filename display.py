@@ -52,7 +52,9 @@ def write_template():
         <title>SASA PLOTS</title> 
         <link rel="stylesheet" type="text/css" href="{{{{ url_for('static', filename='css/style.css') }}}}">
     </head>
-    <body>""")
+    <body>
+    <button onclick="window.location.href='/'"> Home</button>
+""")
             
             for plot in plot_names:
                 file.write(f"""<img src="{{{{ url_for('static', filename='plots/{plot}') }}}}" alt="#" class="image">\n""")
