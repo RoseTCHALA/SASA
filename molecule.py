@@ -467,7 +467,7 @@ class Molecule(Atom) :
 		nb_chains = 0
 
 		for ligne in file :
-				if ligne.startswith("COMPND") and "CHAIN" in ligne :
+				if ligne.startswith("COMPND") and "CHAIN:" in ligne :
 					g = ligne.split() ; index = (g.index("CHAIN:"))
 					#On regarde si la molécule comporte plusieurs chaines 
 					nb_chains = (len(g[index + 1 :]))
@@ -661,14 +661,60 @@ class Molecule(Atom) :
 
 	def plot_acess_chains(self):
 		color_map = {
-        'A': 'navy',
-        'B': 'black',
-        'C': 'blue',
-		"A'": 'red',
-        "B'": 'pink',
-        "C'": 'orange',
+    'A': 'navy',
+    'B': 'black',
+    'C': 'blue',
+    "A'": 'red',
+    "B'": 'pink',
+    "C'": 'orange',
+    'D': 'green',
+    'E': 'purple',
+    'F': 'yellow',
+    "D'": 'cyan',
+    "E'": 'magenta',
+    "F'": 'brown',
+    'G': 'lime',
+    'H': 'indigo',
+    'I': 'teal',
+    "G'": 'gold',
+    "H'": 'silver',
+    "I'": 'beige',
+    'J': 'maroon',
+    'K': 'olive',
+    'L': 'coral',
+    "J'": 'lavender',
+    "K'": 'turquoise',
+    "L'": 'peach',
+    'M': 'salmon',
+    'N': 'plum',
+    'O': 'chocolate',
+    "M'": 'khaki',
+    "N'": 'crimson',
+    "O'": 'amber',
+    'P': 'orchid',
+    'Q': 'aquamarine',
+    'R': 'azure',
+    "P'": 'violet',
+    "Q'": 'goldenrod',
+    "R'": 'sienna',
+    'S': 'lavender',
+    'T': 'chartreuse',
+    'U': 'midnight blue',
+    "S'": 'emerald',
+    "T'": 'rust',
+    "U'": 'tan',
+    'V': 'denim',
+    'W': 'rose',
+    'X': 'steel blue',
+    "V'": 'copper',
+    "W'": 'seashell',
+    "X'": 'ivory',
+    'Y': 'aqua',
+    'Z': 'forest green',
+    "Y'": 'light gray',
+    "Z'": 'dark gray'
+}
 
-    }
 		if self.nbchains is not None:
 			x, y, colors, chain_labels = [], [], [], []
 			for atom in self.atoms:
