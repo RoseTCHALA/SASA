@@ -1,0 +1,34 @@
+
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+		<title>SASA</title> 
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide">
+	</head>
+	
+	<body>
+        <section>
+            <div class = "propos">
+                <h2 class="un">CALCULER SASA</h2>
+                <h3 class = "deux">(Solvant Accessible Surface Area)</h3>
+                <h4 class = "deux">Une approximation de l'algorithme de Shake et Rupley (1973)</h4>
+            </div>
+            <div class = "bouton">
+                <form action="{{ url_for('predict') }}" class = "formulaire" method="POST" enctype="multipart/form-data">
+                    <label for="fileInput" class="fileLabel">
+                        <div class="button19">
+                            <span class="fileText">CALCULER</span>
+                        </div>
+                        <input type="file" id="fileInput" name ="file"  style="display:none" onchange="form.submit()" accept=".pdb">
+                    </label>
+                </form>
+            </div>
+        </section>
+        <script>
+            // JavaScript function to submit the form when a file is selected
+        </script>
+
+    </body>
+</html>
