@@ -40,8 +40,12 @@ radii_dict = {
 
 #creation de la classe Atome
 class Atom:
-	def __init__(self,x,y,z, numres = "", name = "", type = "", accessibility = None, radii = None, Wan_der_Waals = None, classe = None) :
+	def __init__(self,x,y,z, numres = "", name = "", type = "", accessibility = None, radii = None, Wan_der_Waals = None, classe = None, chain = None) :
 		self.name = name
+
+
+		#Chaine de l'atome si il y a 
+		self.chain = None 
 
 		#Type de residu
 		self.type = type
@@ -112,6 +116,9 @@ class Atom:
 		
 	def mute_atom(self,name1) :
 			self.name = name1
+
+	def chain_atom(self,chaine) :
+			self.chain = chaine
 	
 	def num_atom(self,numero) :
 			self.numres = numero
@@ -206,14 +213,22 @@ class Sphere(Atom):
 
 class Molecule(Atom) :
 
-	def __init__(self,name, list_atoms =  [], accessibility = None, polar_accessibility = None, non_polar_accessibility = None) :
+	def __init__(self,name, accessibility = None, polar_accessibility = None, non_polar_accessibility = None, nbchains = None) :
+		
 		self.name = name	
-		self.atoms = list_atoms
+		self.atoms = []
 		self.accessibility = None
 		self.polar_accessibility = None
 		self.non_polar_accessibility = None
 
+		#On compute le nombre de chaines de la molécule
+		self.nbchains = None
 
+
+	#Permet d'avoir le nombre de chaines de la molécule
+	#Si il y a plusieurs chaines alors le plot sera adapté
+	def __molecule_chains__(self,nb) :
+			self.nbchains = nb
 
 		
 	def __molecule_SASA__(self,valeur) :
@@ -303,7 +318,11 @@ class Molecule(Atom) :
 
 	#Cette fonction permet de creer un objet molécule a partir d'un texte
 	#Pas de spécification de la chaine 
-	def create_molecule(f,name, L = [], conect_lines = []) :
+	def create_molecule(f,name) :
+
+		L = []
+		conect_lines = []
+
 		for i in range(0,len(f)) : 
 			ligne = f[i]
 			if ligne.startswith("ATOM") and ligne[76:78].strip() != "H" : 
@@ -368,24 +387,28 @@ class Molecule(Atom) :
 	
 
 	#Fonction qui crée un objet molécule en prenant en compte l'identité de la chaine
-	def strip_chain(f,name, chain, L = [], conect_lines = []) :
-		if chain is not None : 
+	def strip_chain(f,name) :
+			L = []
+			conect_lines = []
+
 			for i in range(0,len(f)) : 
 				ligne = f[i]
-				if ligne.startswith("ATOM") and ligne[76:78].strip() != "H"  and ligne[21:22] == chain : 
+				if ligne.startswith("ATOM") and ligne[76:78].strip() != "H" : 
 					a = Atom(float(ligne[30:38]), float(ligne[38:46]), float(ligne[46:54]))
 					a.type_atom(ligne[76:78].strip())
 					a.num_atom(int(ligne[7:11]))
+					a.chain_atom(ligne[21:22])
 
 					#"Normal atom are considered not polar"
 					a.__class_atom__(False)
 					L.append(a)
 
-				elif ligne.startswith("HETATM") and ligne[76:78].strip() != "H" and ligne[21:22] ==  chain : 
-
+				elif ligne.startswith("HETATM") and ligne[76:78].strip() != "H" : 
 					a = Atom(float(ligne[30:38]), float(ligne[38:46]), float(ligne[46:54]))
 					a.type_atom(ligne[76:78].strip())
 					a.num_atom(int(ligne[7:11]))
+					a.chain_atom(ligne[21:22])
+
 
 					#Hetero atoms are  polar
 					a.__class_atom__(True)
@@ -401,32 +424,36 @@ class Molecule(Atom) :
 					conect_lines.append(ligne.split())
 
 			#creation d'un objet molécule
-			molecule = Molecule(f"{name} chain {chain}")
+			molecule = Molecule(name)
 			for atom in L :
 				molecule.add_atom(atom)
 
 			#Si il y a des atomes connectés :
 			if len(conect_lines) > 0 :
+
 					atom_connections = {}
-					# Parse the CONECT lines
+
+
+					
 					for line in conect_lines:
 						atom_serial = int(line[1])  # Atom serial number
 						atom = molecule.__find_atom__(atom_serial)
 
-						#Dans le cas ou il y a plusieurs chaines on ne prend pas en compte les connections de deux chaines différentes
-						if atom is not None : 
+						#On ne recherche que les connections des carbonnes non polaires
+						if atom.type == "C" and atom.classe == False : 
+							connected_atoms = [molecule.__find_atom__(int(indice)) for indice in line[2:]]  # Ajoute les atomes à la liste du dictionnaire
+							# Add the connections for this atom
+							if atom_serial not in atom_connections:
+								atom_connections[atom_serial] = []
 
-							#On ne recherche que les connections des carbonnes non polaires
-							if atom.type == "C" and atom.classe == False : 
-								connected_atoms = [molecule.__find_atom__(int(indice)) for indice in line[2:]]  # Ajoute les atomes à la liste du dictionnaire
-								# Add the connections for this atom
-								if atom_serial not in atom_connections:
-									atom_connections[atom_serial] = []
-
-								#On ajoute chaque atome à la liste
-								atom_connections[atom_serial].extend(connected_atoms)
+							#On ajoute les atomes connectés à la liste
+							atom_connections[atom_serial].extend(connected_atoms)
 
 					molecule.__change_polarity__(atom_connections)
+
+				
+
+				
 			return(molecule)
 		
 	
@@ -455,11 +482,10 @@ class Molecule(Atom) :
 			print(f"Il y a {nb_chains} chaines dans la molecule")
 			#Création d'une liste qui comprend plusieurs chaines de la molécule
 			liste_molecule = []
-			for k in range(index+1, len(g)) :
-				chaine = g[k][:-1]
-				molecule = Molecule.strip_chain(file,filename, chaine.strip())
-				liste_molecule.append(molecule)
-			return liste_molecule
+			molecule = Molecule.strip_chain(file,filename)
+			#On ajoute le nombre de chaines en tant que attribut dans la molécule
+			molecule.__molecule_chains__(nb_chains)
+			return molecule
 							
 
 		#Pas d'information sur la chaine dans le fichier PDB alors on lit la molécule normalement
@@ -523,6 +549,8 @@ class Molecule(Atom) :
 
 		TOTAL_SASA, POLAR_SASA, NON_POLAR_SASA = 0,0,0
 
+
+
 		#Calcul de la matrice de distance
 		matrice = Molecule.matrice_distance(self)
 
@@ -531,7 +559,8 @@ class Molecule(Atom) :
 
 		sphere = Sphere.compute_sphere_golden_spiral(n = 92)
 
-		
+
+		#La partie "rolling ball"
 		Molecule.translation(self, sphere, radii_solvant)
 
 		#iteration sur chaque atome
@@ -577,6 +606,7 @@ class Molecule(Atom) :
 			#Surface de la sphere recouverte par un seul point
 			rayon_sphere =  4 * math.pi * atom.radii ** 2 / len(sphere)
 
+
 			surface_accessible = rayon_sphere * n_accessible
 
 			TOTAL_SASA += surface_accessible
@@ -588,10 +618,13 @@ class Molecule(Atom) :
 
 
 
+
 			#On modifie l'objet atom auquel on ajoute l'acessibilité
 			atom.acess_atom(surface_accessible)
 			#print(surface_accessible)
 		
+		print("TOTAL_SASA:", TOTAL_SASA)  # Check initial value
+
 		#On remplit l'accessibilité totale en surface de la molecule en attribut
 		self.__molecule_SASA__(TOTAL_SASA)
 		self.__molecule_SASA_POLAR__(POLAR_SASA)
@@ -625,22 +658,76 @@ class Molecule(Atom) :
 		plt.close()
 
 
+
+	def plot_acess_chains(self):
+		color_map = {
+        'A': 'navy',
+        'B': 'black',
+        'C': 'blue',
+		"A'": 'red',
+        "B'": 'pink',
+        "C'": 'orange',
+
+    }
+		if self.nbchains is not None:
+			x, y, colors, chain_labels = [], [], [], []
+			for atom in self.atoms:
+				y.append(atom.accessibility)
+				x.append(atom.numres)
+
+				chain_id = atom.chain
+				colors.append(color_map.get(chain_id, 'gray'))
+
+
+				#On ajoute la chaine à la liste des chaines disponibles pour la légence
+				if atom.chain not in chain_labels:
+					chain_labels.append(atom.chain)
+			
+
+
+
+			plt.bar(x, y, color=colors)
+
+			plt.title(f'{self.name}')
+			plt.xlabel('Numero de résidu')
+			plt.ylabel('Surface exposée (Å²)')
+
+			legend_elements = [plt.Line2D([0], [0], color=color_map[chain], lw=4, label=f'Chaine {chain}')
+                           for chain in chain_labels]
+			
+			plt.legend(handles=legend_elements, title="Chaines")
+
+			legende = f""" Surface d'Accessibilité totale (Å²) : {round(self.accessibility, 2)} \n Atomes Polaires : {round(self.polar_accessibility, 2)} \n Atomes Non Polaires : {round(self.non_polar_accessibility, 2)}"""
+			plt.text(-0.1, -0.3, legende, transform=plt.gca().transAxes, fontsize=9)
+
+			plt.tight_layout()
+			plt.savefig(f"./static/plots/{self.name.replace(' ', '_')}.png", dpi=2400)
+
+			plt.close()
+
+
+
+
+
+
+			
+
+
 	#Generation de l'accessibilité atomique, de graphique en une seule fonction
 	def calcul_SASA(molecule, radii_solvant = 1.52, n = 92) :
 
 		#Une seule chaine ou pas de chaine spécifiée
 		if isinstance(molecule, Molecule) :
-			molecule.atomic_accessibility(n, radii_solvant)
-			molecule.plot_acess()
 
-		#Une seule molécule qui comprend plusieurs chaines ( donc le calcul se faire séparement pour toutes les chaines)
-		if isinstance(molecule, list) :
-			t = 0
-			for mol in molecule :
-				mol.atomic_accessibility(n, radii_solvant)
-				mol.plot_acess()
-				t+= mol.accessibility
-			print(f"All chains accessibility : {round(t),2}")
+			molecule.atomic_accessibility(n, radii_solvant)
+
+			if molecule.nbchains is None : 
+				molecule.plot_acess()
+
+			else :
+				molecule.plot_acess_chains()
+
+	
 
 
 
