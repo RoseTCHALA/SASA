@@ -10,25 +10,17 @@
 
 ## Prise en main
 
-### 1 : Téléchargement du repository sur GitHub
+### 1 : Téléchargement du repository
 
+Note : il est essentiel d'avoir Conda sur votre machine pour utiliser le programme. Vous pouvez installer anaconda ici : 
+
+https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
+
+##### Dans votre terminal, lancez les commandes : 
+git clone https://github.com/RoseTCHALA/SASA.gitcd SASAconda env create -f env.ymlconda activate envpython app.py ou python3 app.py
 ### 2 : Execuction du script app.py (de préférence via un terminal ou VS Code)
 
-#### Modules utilisés dans le code
-
-Numpy
-
-Math
-
-matplotlib.pyplot
-
-scipy.spatial.distance (à installer potentiellement)
-
-flask (à installer potentiellement)
-
-
-Il est bon de préciser que le script app.py doit être lancé à partir du répertoire de l'application. 
-Une fois le script lancé, votre terminal affichera une adresse https de développement local (par exemple http://127.0.0.1:5000). Ouvrez le lien dans le navigateur de votre choix et gardez le terminal ouvert pour suivre l'avancement des calculs.
+Votre terminal affichera une adresse https de développement local (par exemple http://127.0.0.1:5000). Ouvrez le lien dans le navigateur de votre choix et gardez le terminal ouvert pour suivre l'avancement des calculs.
 
 ### 3 : Comment calculer la SASA de ma molécule ? 
 
@@ -62,13 +54,13 @@ Il est important de noter que, pour la surface accessible des atomes polaires, l
 
 ### Dans le navigateur
 
-Dans le navigateur, un seul graphique est affiché si la molécule est une protéine composée d'une seule chaîne ou s'il s'agit d'un autre type de molécule. En revanche, si la protéine comporte plusieurs chaînes, un graphique distinct est généré pour chacune d'elles.
+Dans le navigateur, un seul graphique est affiché.
 
-En abcisse, on trouve le numéro de résidu de l'atome et en ordonné, c'est sa surface accessible en Å². Dans la légende on retrouve la surface totale accessible ainsi que la surface accessible des atomes polaires et non polaires.
+En abcisse, on trouve le numéro de résidu de l'atome et en ordonné, c'est sa surface accessible en Å². Dans la légende on retrouve la surface totale accessible ainsi que la surface accessible des atomes polaires et non polaires et l'emplacement des chaines (si la structure en a).
 
 ##### Quelle est l'utilité du terminal si on y trouve les mêmes informations que sur les graphiques ? 
 
-Dans le cadre ou la molécule comporte plusieurs chaines, on trouve la surface totale accessible totale (de toutes les chaines) dans le terminal uniquement. Il est essentiel de préciser que conformément aux travaux de Shake et Rupley on considère que deux atomes issus de deux chaines distinctes ne peuvent pas occlurent leurs surfaces respectives.
+Dans le terminal on peut observer l'accesibilité individuelle des atomes.
 
 ## Limites et disscussion
 
