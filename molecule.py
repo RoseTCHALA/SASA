@@ -726,7 +726,8 @@ class Molecule(Atom) :
 
 			else :
 				molecule.plot_acess_chains()
-		print(molecule)
+
+			print(molecule)
 
 	
 
