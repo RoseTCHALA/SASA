@@ -18,10 +18,15 @@ https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
 
 ##### Dans votre terminal, lancez les commandes : 
 git clone https://github.com/RoseTCHALA/SASA.git
+
 cd SASA
+
 conda env create -f env.yml
+
 conda activate env
+
 python app.py
+
 ### 2 : Execuction du script app.py (de préférence via un terminal ou VS Code)
 
 Votre terminal affichera une adresse https de développement local (par exemple http://127.0.0.1:5000). Ouvrez le lien dans le navigateur de votre choix et gardez le terminal ouvert pour suivre l'avancement des calculs.
