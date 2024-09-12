@@ -37,7 +37,7 @@ Pour l'instant, il n'est pas encore possible de préciser la surface en Å² du 
 
 ##### Et donc ? 
 
-Et donc une fois arrivé(e) sur l'interface web sain(e) et sauf(ve), il suffit de cliquer sur le bouton calculer et chosir le fichier PDB de votre choix. Une fois le fichier choisi le programme se lance automatiquement.
+Et donc une fois arrivé(e) sur l'interface web sain(e) et sauf(ve), il suffit de cliquer sur le bouton calculer et chosir le fichier PDB de votre choix. Par exemple, vous pouvez choisir le fichier "1imb.pdb" dans le dossier static/data du répertoire. D'autres fichiers sont présents dans ce repertoire pour tester plusieurs molécules. Une fois le fichier choisi le programme se lance automatiquement.
 
 ### 4 : Suivre l'avancée du programme
 
